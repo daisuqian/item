@@ -21,6 +21,20 @@
         from teacher
         where id = #{id,jdbcType=INTEGER}
     </select>
+
+    <select id="getAll" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from teacher
+    </select>
+
+    <select id="selectByIdAndName" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from teacher
+        where id=#{id,jdbcType=INTEGER} and name=#{name,jdbcType=VARCHAR}
+    </select>
+
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
         DELETE FROM teacher
         WHERE id = #{id,jdbcType=INTEGER}

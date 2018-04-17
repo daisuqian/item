@@ -11,6 +11,7 @@ public class Const {
 
     public static final String CURRENT_TEACHER = "current_teacher";
     public static final String STUDENT_ID = "id";
+    public static final String TEACHER_ID = "id";
     public static final String STUDENT_CLASS_NUM = "class_num";
     public static final String STUDENT_DOR_NUM = "dor_num";
     public static final String MALE = "男";

@@ -37,11 +37,20 @@ public interface ITeacherService {
     ServerResponse<String> batchImportInfo(String filename, MultipartFile file, String path);
 
     /*
-     * Date:2018/4/16
-     * Name:韩向领
+     * Date:2018/4/16-4/17
      */
     ServerResponse<Teacher> addTeacher(int id,String school,String department,
                                        String name,int permission);
 
     ServerResponse<List<Teacher>> deleteTeacherByID(int id);
+
+    ServerResponse<Teacher> teacherList(int id);
+
+    ServerResponse<List<Teacher>> getAll();
+
+    ServerResponse<Teacher> selectByIdAndName(int id,String name);
+
+    ServerResponse<Teacher> updateTeacher(int id,String school,
+                                          String department,String name,int permission);
+
 }

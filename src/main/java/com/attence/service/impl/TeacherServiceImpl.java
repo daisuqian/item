@@ -6,6 +6,7 @@ import com.attence.common.ServerResponse;
 import com.attence.dao.*;
 import com.attence.pojo.*;
 import com.attence.pojo.Class;
+import com.attence.pojo.Teacher;
 import com.attence.service.ITeacherService;
 import com.attence.utils.ReadExcel;
 import com.attence.vo.StudentDetail;
@@ -313,21 +314,196 @@ public class TeacherServiceImpl implements ITeacherService {
                     return ServerResponse.createByErrorMessage("ID_IS_ALREADY_EXIST");
                 }
             }
-            // 检查班级号是否存在
-            if (Const.STUDENT_CLASS_NUM.equals(type)) {
-                int resultCount = classMapper.checkClassNum(Integer.valueOf(str));
-                // 班级号不存在
-                if (resultCount == 0) {
-                    return ServerResponse.createByErrorMessage("CLASS_NUM_NOT_EXIST");
+
+
+
+                // 检查班级号是否存在
+                if (Const.STUDENT_CLASS_NUM.equals(type)) {
+                    int resultCount = classMapper.checkClassNum(Integer.valueOf(str));
+                    // 班级号不存在
+                    if (resultCount == 0) {
+                        return ServerResponse.createByErrorMessage("CLASS_NUM_NOT_EXIST");
+                    }
+                }
+                // 检查寝室号是否存在
+                if (Const.STUDENT_DOR_NUM.equals(type)) {
+                    int resultCount = dormitoryMapper.checkDorNum(str);
+                    if (resultCount == 0) {
+                        return ServerResponse.createByErrorMessage("DOR_NUM_NOT_EXIST");
+                    }
+                }
+            } else {
+                return ServerResponse.createByErrorCodeMessage(ResponseCode.ILLEGAL_ARGUMENT.getCode(),
+                        ResponseCode.ILLEGAL_ARGUMENT.getDesc());
+            }
+            return ServerResponse.createBySuccessMessage("SUCCESS");
+        }
+
+        private ServerResponse addStudentAndClass (List<Student>studentList, List<Class>classList){
+            int size;
+            // 先插入班级
+            size = classList.size();
+            for (int i = 0; i < size; i++) {
+                Class clazz = classList.get(i);
+                int resultCount = classMapper.checkClassNum(clazz.getId());
+                // 如果班级号已存在证明插入过, 直接跳过
+                if (resultCount > 0) {
+                    continue;
+                }
+                classMapper.insert(clazz);
+            }
+            size = studentList.size();
+            for (int i = 0; i < size; i++) {
+                Student student = studentList.get(i);
+                int resultCount = studentMapper.checkStudentID(student.getId());
+                if (resultCount > 0) {
+                    continue;
+                }
+                studentMapper.insertSelective(student);
+            }
+
+            return ServerResponse.createBySuccessMessage("INSERT_SUCCESS");
+        }
+
+        private ServerResponse addDormitory (List < Dormitory > dormitoryList) {
+            int size = dormitoryList.size();
+            for (int i = 0; i < size; i++) {
+                Dormitory dormitory = dormitoryList.get(i);
+                int resultCount = dormitoryMapper.checkDorNum(dormitory.getDorId());
+                // 如果寝室号已存在就将设备号添加进去
+                if (resultCount > 0) {
+                    dormitoryMapper.updateByPrimaryKeySelective(dormitory);
+                } else {
+                    // 添加新寝室和设备号
+                    dormitoryMapper.insertSelective(dormitory);
                 }
             }
-            // 检查寝室号是否存在
-            if (Const.STUDENT_DOR_NUM.equals(type)) {
-                int resultCount = dormitoryMapper.checkDorNum(str);
-                if (resultCount == 0) {
-                    return ServerResponse.createByErrorMessage("DOR_NUM_NOT_EXIST");
+            return ServerResponse.createBySuccessMessage("INSERT_SUCCESS");
+        }
+
+        private ServerResponse addEquipment (List < Equipment > equipmentList) {
+            int size = equipmentList.size();
+            for (int i = 0; i < size; i++) {
+                Equipment equipment = equipmentList.get(i);
+                int resultCount = equipmentMapper.checkEquipmentId(equipment.getId());
+                if (resultCount > 0) {
+                    continue;
+                }
+                equipmentMapper.insertSelective(equipment);
+            }
+            return ServerResponse.createBySuccessMessage("INSERT_SUCCESS");
+        }
+/**---------------Date 2018 4 16 至 4 17-------------------**/
+        /**
+         * 添加辅导员信息
+         * @param id 职工号
+         * @param school 学校名称
+         * @param department 院系
+         * @param name 姓名
+         * @param permission 权限 (辅导员：1  超级管理员：2)
+         **/
+        @Override
+        public ServerResponse<Teacher> addTeacher ( int id, String school, String department, String name,int permission)
+        {
+
+            Teacher teacher = new Teacher(id, school, department, name, permission);
+            int resultCount = teacherMapper.insert(teacher);
+            if (resultCount > 0) {
+                return ServerResponse.createBySuccess(teacher);
+            }
+            return ServerResponse.createByError();
+        }
+
+        /**
+         * 获取所有辅导员信息
+         * @return
+         */
+        @Override
+        public ServerResponse<List<Teacher>> getAll () {
+            List<Teacher> teachers = teacherMapper.getAll();
+            return ServerResponse.createBySuccess(teachers);
+        }
+
+        /**
+         * 通过职工号删除辅导员信息
+         * @Param id 职工号
+         **/
+        @Override
+        public ServerResponse<List<Teacher>> deleteTeacherByID ( int id){
+
+            int count = teacherMapper.deleteByPrimaryKey(id);
+
+            if (count == 0) {
+                return ServerResponse.createByErrorMessage("DELETE_ERROR");
+            }
+            //return ServerResponse.createBySuccessMessage("DELETE_SUCCESS");
+            return getAll();
+        }
+
+        /**
+         * 通过职工号辅导员查看自己的信息
+         * @param id 职工号
+         * @return
+         */
+
+        @Override
+        public ServerResponse<Teacher> teacherList ( int id){
+            Teacher teacher = teacherMapper.selectByPrimaryKey(id);
+            if (teacher == null) {
+                return ServerResponse.createByErrorMessage("ID_DOESN'T_EXIST");
+            }
+            return ServerResponse.createBySuccess("Your_INFORMATION", teacher);
+        }
+
+        /**
+         * 通过辅导员的职工号和姓名查询其信息
+         * @param id 职工号
+         * @param name 姓名
+         * @return
+         */
+        @Override
+        public ServerResponse<Teacher> selectByIdAndName ( int id, String name)
+        {
+            Teacher teacher = teacherMapper.selectByIdAndName(id, name);
+            return ServerResponse.createBySuccess("TEACHER_INFORMATION", teacher);
+        }
+
+
+    @Override
+    public ServerResponse<Teacher> updateTeacher(int id,String school,String department,
+                                                 String name,int permission) {
+        ServerResponse response = checkValid2(Const.TEACHER_ID, String.valueOf(id));
+        // if执行说明职工号不存在
+        if (response.isSuccess()) {
+            return ServerResponse.createByErrorMessage("ID_IS_NOT_EXIST");
+        }
+
+        // 校验完成开始修改信息
+        Teacher teacher = new Teacher(id,school,department,name,permission);
+        int resultCount = teacherMapper.updateByPrimaryKeySelective(teacher);
+        if (resultCount > 0) {
+            return ServerResponse.createBySuccess(teacher);
+        }
+        return ServerResponse.createByError();
+    }
+
+
+
+
+    private ServerResponse checkValid2(String type, String str) {
+        // 判断类型
+        boolean suc = StringUtils.isNotBlank(type) && StringUtils.isNotBlank(str) &&
+                StringUtils.equals(type, Const.TEACHER_ID);
+        if (suc) {
+            //开始校验
+            if (Const.TEACHER_ID.equals(type)) {
+                // 检查职工号是否存在
+                int resultCount = teacherMapper.checkTeacherId(Integer.valueOf(str));
+                if (resultCount > 0) {
+                    return ServerResponse.createByErrorMessage("ID_IS_ALREADY_EXIST");
                 }
             }
+
         } else {
             return ServerResponse.createByErrorCodeMessage(ResponseCode.ILLEGAL_ARGUMENT.getCode(),
                     ResponseCode.ILLEGAL_ARGUMENT.getDesc());
@@ -335,94 +511,7 @@ public class TeacherServiceImpl implements ITeacherService {
         return ServerResponse.createBySuccessMessage("SUCCESS");
     }
 
-    private ServerResponse addStudentAndClass(List<Student> studentList, List<Class> classList) {
-        int size;
-        // 先插入班级
-        size = classList.size();
-        for (int i = 0; i < size; i++) {
-            Class clazz = classList.get(i);
-            int resultCount = classMapper.checkClassNum(clazz.getId());
-            // 如果班级号已存在证明插入过, 直接跳过
-            if (resultCount > 0) {
-                continue;
-            }
-            classMapper.insert(clazz);
-        }
-        size = studentList.size();
-        for (int i = 0; i < size; i++) {
-            Student student = studentList.get(i);
-            int resultCount = studentMapper.checkStudentID(student.getId());
-            if (resultCount > 0) {
-                continue;
-            }
-            studentMapper.insertSelective(student);
-        }
 
-        return ServerResponse.createBySuccessMessage("INSERT_SUCCESS");
-    }
-
-    private ServerResponse addDormitory(List<Dormitory> dormitoryList) {
-        int size = dormitoryList.size();
-        for (int i = 0; i < size; i++) {
-            Dormitory dormitory = dormitoryList.get(i);
-            int resultCount = dormitoryMapper.checkDorNum(dormitory.getDorId());
-            // 如果寝室号已存在就将设备号添加进去
-            if (resultCount > 0) {
-                dormitoryMapper.updateByPrimaryKeySelective(dormitory);
-            } else {
-                // 添加新寝室和设备号
-                dormitoryMapper.insertSelective(dormitory);
-            }
-        }
-        return ServerResponse.createBySuccessMessage("INSERT_SUCCESS");
-    }
-
-    private ServerResponse addEquipment(List<Equipment> equipmentList) {
-        int size = equipmentList.size();
-        for (int i = 0; i < size; i++) {
-            Equipment equipment = equipmentList.get(i);
-            int resultCount = equipmentMapper.checkEquipmentId(equipment.getId());
-            if (resultCount > 0) {
-                continue;
-            }
-            equipmentMapper.insertSelective(equipment);
-        }
-        return ServerResponse.createBySuccessMessage("INSERT_SUCCESS");
-    }
-
-    /**
-     * 添加辅导员信息
-     * @param id 职工号
-     * @param school 学校名称
-     * @param department 院系
-     * @param name 姓名
-     * @param permission 权限 (辅导员：1  超级管理员：2)
-     **/
-    @Override
-    public ServerResponse<Teacher> addTeacher(int id,String school,String department,String name,int permission) {
-
-        Teacher teacher = new Teacher(id,school,department,name,permission);
-        int resultCount = teacherMapper.insert(teacher);
-        if (resultCount > 0) {
-            return ServerResponse.createBySuccess(teacher);
-        }
-        return ServerResponse.createByError();
-    }
-
-    /**
-     * 通过职工号删除辅导员信息
-     * @Param id 职工号
-     **/
-    @Override
-    public ServerResponse<List<Teacher>> deleteTeacherByID(int id) {
-
-        int count = teacherMapper.deleteByPrimaryKey(id);
-
-        if (count == 0) {
-            return ServerResponse.createByErrorMessage("DELETE_ERROR");
-        }
-        return ServerResponse.createBySuccessMessage("DELETE_SUCCESS");
-    }
 
 }
 

@@ -57,7 +57,7 @@ public class TeacherController {
         return response;
     }
 
-    @RequestMapping(value = "/logout.do", method = RequestMethod.POST)
+    @RequestMapping(value = "logout.do", method = RequestMethod.POST)
     @ResponseBody
     public ServerResponse<String> logout(HttpSession session) {
         ServerResponse response = loginSucc(session);
@@ -191,7 +191,7 @@ public class TeacherController {
         }
         return ServerResponse.createBySuccessMessage("YES");
     }
-
+/**----------------------Date 2018 4 16 至 4 17-------------**/
     /**
      * @param id  职工号
      * @param school  学校名称
@@ -229,4 +229,77 @@ public class TeacherController {
         return iTeacherService.deleteTeacherByID(id);
     }
 
+    /**
+     * 通过职工号辅导员查看自己的信息
+     * @param id 职工号
+     * @param session
+     * @return
+     */
+
+    @RequestMapping(value = "own_info.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<Teacher> teacherList(int id,HttpSession session) {
+        ServerResponse<Teacher> response = iTeacherService.teacherList(id);
+        // 将 teacher放入session中
+        if (response.isSuccess()) {
+            session.setAttribute(Const.CURRENT_TEACHER, response.getData());
+        }
+        return response;
+    }
+
+    /**
+     *查看所有辅导员的详细信息
+     * @param session
+     * @return
+     */
+
+    @RequestMapping(value = "get_all.do",method = RequestMethod.POST )
+    @ResponseBody
+    public ServerResponse<List<Teacher>> getAll(HttpSession session) {
+        ServerResponse response = loginSucc(session);
+        if (!response.isSuccess()) {
+            return response;
+        }
+        return iTeacherService.getAll();
+    }
+
+    /**
+     * 通过职工号和姓名查询辅导员信息
+     * @param id
+     * @param name
+     * @param session
+     * @return
+     */
+    @RequestMapping(value = "teacher_info.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<Teacher> selectByIdAndName(int id,String name,
+                                                     HttpSession session) {
+        ServerResponse<Teacher> response = iTeacherService.selectByIdAndName(id,name);
+        // 将 teacher放入session中
+        if (response.isSuccess()) {
+            session.setAttribute(Const.CURRENT_TEACHER, response.getData());
+        }
+        return response;
+    }
+
+    /**
+     * 更新辅导员信息
+     * @param id
+     * @param school
+     * @param department
+     * @param name
+     * @param permission
+     * @param session
+     * @return
+     */
+    @RequestMapping(value = "update_teacher.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<Teacher> updateTeacher(int id, String school,String department,String name,
+                                                 int permission, HttpSession session) {
+        ServerResponse response = loginSucc(session);
+        if (!response.isSuccess()) {
+            return response;
+        }
+        return iTeacherService.updateTeacher(id,school,department,name,permission);
+    }
 }
