@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.attence.dao.DormitoryMapper">
+    <resultMap id="BaseResultMap" type="com.attence.pojo.Dormitory">
+        <constructor>
+            <idArg column="dor_id" jdbcType="VARCHAR" javaType="java.lang.String"/>
+        </constructor>
+    </resultMap>
+    <resultMap id="ResultMapWithBLOBs" type="com.attence.pojo.Dormitory">
+        <constructor>
+            <idArg column="dor_id" jdbcType="VARCHAR" javaType="java.lang.String"/>
+            <arg column="equip_id" jdbcType="LONGVARCHAR" javaType="java.lang.String"/>
+        </constructor>
+    </resultMap>
+    <sql id="Base_Column_List">
+        dor_id
+    </sql>
+    <sql id="Blob_Column_List">
+        equip_id
+    </sql>
+    <select id="selectByPrimaryKey" resultMap="ResultMapWithBLOBs"
+            parameterType="java.lang.String">
+        select
+        <include refid="Base_Column_List"/>
+        ,
+        <include refid="Blob_Column_List"/>
+        from dormitory
+        where dor_id = #{dorId,jdbcType=VARCHAR}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+        DELETE FROM dormitory
+        WHERE dor_id = #{dorId,jdbcType=VARCHAR}
+    </delete>
+    <insert id="insert" parameterType="com.attence.pojo.Dormitory">
+        INSERT INTO dormitory (dor_id, equip_id)
+        VALUES (#{dorId,jdbcType=VARCHAR}, #{equipId,jdbcType=LONGVARCHAR})
+    </insert>
+    <insert id="insertSelective" parameterType="com.attence.pojo.Dormitory">
+        insert into dormitory
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="dorId != null">
+                dor_id,
+            </if>
+            <if test="equipId != null">
+                equip_id,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="dorId != null">
+                #{dorId,jdbcType=VARCHAR},
+            </if>
+            <if test="equipId != null">
+                #{equipId,jdbcType=LONGVARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.attence.pojo.Dormitory">
+        update dormitory
+        <set>
+            <if test="equipId != null">
+                equip_id = #{equipId,jdbcType=LONGVARCHAR},
+            </if>
+        </set>
+        where dor_id = #{dorId,jdbcType=VARCHAR}
+    </update>
+    <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.attence.pojo.Dormitory">
+        UPDATE dormitory
+        SET equip_id = #{equipId,jdbcType=LONGVARCHAR}
+        WHERE dor_id = #{dorId,jdbcType=VARCHAR}
+    </update>
+
+    <select id="checkDorNum" resultType="java.lang.Integer">
+        SELECT count(1)
+        FROM attence.dormitory
+        WHERE dor_id = #{dorId}
+    </select>
+
+
+</mapper>
