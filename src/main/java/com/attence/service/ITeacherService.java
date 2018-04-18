@@ -52,5 +52,5 @@ public interface ITeacherService {
 
     ServerResponse<Teacher> updateTeacher(int id,String school,
                                           String department,String name,int permission);
-
+    ServerResponse<Teacher> updatePasswd(int id,String password);
 }

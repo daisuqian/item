@@ -24,5 +24,6 @@ public interface TeacherMapper {
 
     Teacher selectByIdAndName(@Param(value="id") int id,@Param(value="name") String name);
 
+    int updatePasswd(@Param(value="id") int id,@Param(value="password") String password);
 
 }

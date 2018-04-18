@@ -441,13 +441,13 @@ public class TeacherServiceImpl implements ITeacherService {
         }
 
         /**
-         * 通过职工号辅导员查看自己的信息
+         * 通过职工号超级管理员查看自己的信息
          * @param id 职工号
          * @return
          */
 
         @Override
-        public ServerResponse<Teacher> teacherList ( int id){
+        public ServerResponse<Teacher> teacherList (int id){
             Teacher teacher = teacherMapper.selectByPrimaryKey(id);
             if (teacher == null) {
                 return ServerResponse.createByErrorMessage("ID_DOESN'T_EXIST");
@@ -511,7 +511,14 @@ public class TeacherServiceImpl implements ITeacherService {
         return ServerResponse.createBySuccessMessage("SUCCESS");
     }
 
-
+    @Override
+    public ServerResponse<Teacher> updatePasswd(int id,String password){
+        int resultCount = teacherMapper.updatePasswd(id,password);
+        if (resultCount > 0) {
+            return ServerResponse.createBySuccessMessage("CHANGE_PASSWORD_SUCCESS");
+        }
+        return ServerResponse.createByError();
+    }
 
 }
 

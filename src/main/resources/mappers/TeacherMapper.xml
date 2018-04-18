@@ -113,6 +113,12 @@
         WHERE id = #{id,jdbcType=INTEGER}
     </update>
 
+    <update id="updatePasswd">
+        UPDATE teacher_login
+        SET password=#{password,jdbcType=VARCHAR}
+        WHERE id = #{id,jdbcType=INTEGER}
+    </update>
+
     <select id="checkTeacherId" resultType="java.lang.Integer">
         SELECT count(1)
         FROM attence.teacher

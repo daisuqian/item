@@ -302,4 +302,16 @@ public class TeacherController {
         }
         return iTeacherService.updateTeacher(id,school,department,name,permission);
     }
+
+    @RequestMapping(value = "update_passwd.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<Teacher> updatePasswd(int id,String password,HttpSession session)
+    {
+        ServerResponse response = loginSucc(session);
+        if (!response.isSuccess()) {
+            return response;
+        }
+        return iTeacherService.updatePasswd(id,password);
+    }
+
 }
