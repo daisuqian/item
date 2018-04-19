@@ -230,24 +230,6 @@ public class TeacherController {
     }
 
     /**
-     * 通过职工号辅导员查看自己的信息
-     * @param id 职工号
-     * @param session
-     * @return
-     */
-
-    @RequestMapping(value = "own_info.do", method = RequestMethod.POST)
-    @ResponseBody
-    public ServerResponse<Teacher> teacherList(int id,HttpSession session) {
-        ServerResponse<Teacher> response = iTeacherService.teacherList(id);
-        // 将 teacher放入session中
-        if (response.isSuccess()) {
-            session.setAttribute(Const.CURRENT_TEACHER, response.getData());
-        }
-        return response;
-    }
-
-    /**
      *查看所有辅导员的详细信息
      * @param session
      * @return
@@ -274,6 +256,10 @@ public class TeacherController {
     @ResponseBody
     public ServerResponse<Teacher> selectByIdAndName(int id,String name,
                                                      HttpSession session) {
+        ServerResponse responses = loginSucc(session);
+        if (!responses.isSuccess()) {
+            return responses;
+        }
         ServerResponse<Teacher> response = iTeacherService.selectByIdAndName(id,name);
         // 将 teacher放入session中
         if (response.isSuccess()) {
