@@ -69,6 +69,10 @@ CREATE TABLE `class` (
   COMMENT '院系',
   `major`      VARCHAR(20) NOT NULL
   COMMENT '专业',
+  start_time DATETIME    NULL
+  COMMENT '查寝开始时间',
+  end_tiem   DATETIME    NULL
+  COMMENT '查寝结束时间',
   PRIMARY KEY (`id`)
 )
   COMMENT '班级基本信息表'
@@ -130,7 +134,7 @@ CREATE TABLE `teacher_login` (
 DROP TABLE IF EXISTS `student_login`;
 CREATE TABLE `student_login` (
   `id`         INT         NOT NULL
-  COMMENT '学号',a
+  COMMENT '学号',
   `password`   VARCHAR(16) NOT NULL
   COMMENT '密码',
   `phone`      VARCHAR(11) DEFAULT NULL
