@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Date;
+
 /**
  * @author zhangsiqi
  */
@@ -18,4 +20,8 @@ public class Class {
     private String department;
 
     private String major;
+
+    private Date startTime;
+
+    private Date endTime;
 }

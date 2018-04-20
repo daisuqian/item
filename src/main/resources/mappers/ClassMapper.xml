@@ -10,8 +10,21 @@
             <arg column="major" jdbcType="VARCHAR" javaType="java.lang.String"/>
         </constructor>
     </resultMap>
+    <resultMap id="BaseResultMapWithTime" type="com.attence.pojo.Class">
+        <constructor>
+            <idArg column="id" jdbcType="INTEGER" javaType="java.lang.Integer"/>
+            <arg column="school" jdbcType="VARCHAR" javaType="java.lang.String"/>
+            <arg column="department" jdbcType="VARCHAR" javaType="java.lang.String"/>
+            <arg column="major" jdbcType="VARCHAR" javaType="java.lang.String"/>
+            <arg column="start_time" jdbcType="TIMESTAMP" javaType="java.util.Date"/>
+            <arg column="end_time" jdbcType="TIMESTAMP" javaType="java.util.Date"/>
+        </constructor>
+    </resultMap>
     <sql id="Base_Column_List">
         id, school, department, major
+    </sql>
+    <sql id="Base_Column_List_With_Time">
+        id,school,department,major,start_time, end_time
     </sql>
     <select id="selectByPrimaryKey" resultMap="BaseResultMap"
             parameterType="java.lang.Integer">
